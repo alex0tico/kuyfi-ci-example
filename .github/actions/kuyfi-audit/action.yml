@@ -1,0 +1,84 @@
+name: Kuyfi audit
+description: >-
+  Builds the example contract, deploys it fresh on Stellar Testnet (Friendbot),
+  audits it with Kuyfi installed from the instawards-2-public branch, uploads
+  the JSON report as an artifact and checks Kuyfi's exit code.
+
+inputs:
+  name:
+    description: Label used for the artifact name.
+    required: true
+  features:
+    description: Cargo features for the contract ("" = safe build, "vulnerable" = broken build).
+    required: false
+    default: ""
+  expected-exit:
+    description: Exit code Kuyfi must return (0 = gates passed, 2 = --fail-on blocked).
+    required: true
+  kuyfi-args:
+    description: Extra arguments for Kuyfi.
+    required: false
+    default: ""
+  kuyfi-repo:
+    required: false
+    default: https://github.com/alex0tico/kuyfi.git
+  kuyfi-ref:
+    required: false
+    default: instawards-2-public
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 22
+
+    - name: Build the contract (${{ inputs.features == '' && 'safe' || inputs.features }})
+      shell: bash
+      run: |
+        rustup toolchain install stable --profile minimal --target wasm32v1-none
+        rustup default stable
+        if [ -n "${{ inputs.features }}" ]; then FEATURES="--features ${{ inputs.features }}"; else FEATURES=""; fi
+        cargo build --release --target wasm32v1-none -p splitter $FEATURES
+
+    - name: Deploy to Testnet (throwaway account funded by Friendbot)
+      id: deploy
+      shell: bash
+      run: |
+        npm ci --no-audit --no-fund
+        node scripts/deploy.mjs target/wasm32v1-none/release/splitter.wasm
+
+    - name: Install Kuyfi from ${{ inputs.kuyfi-ref }}
+      shell: bash
+      run: |
+        git clone --depth 1 --branch "${{ inputs.kuyfi-ref }}" "${{ inputs.kuyfi-repo }}" "$RUNNER_TEMP/kuyfi"
+        cd "$RUNNER_TEMP/kuyfi"
+        npm ci --no-audit --no-fund
+        npm run build
+        npm install -g . --no-audit --no-fund
+
+    - name: Run Kuyfi
+      id: kuyfi
+      shell: bash
+      run: |
+        # Never fail here: the report must be uploaded first, and the exit
+        # code is checked in the last step.
+        set +e
+        kuyfi "${{ steps.deploy.outputs.contract_id }}" --config kuyfi.config.json --json ${{ inputs.kuyfi-args }}
+        echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+
+    - name: Upload the JSON report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: kuyfi-report-${{ inputs.name }}
+        path: kuyfi-report-*.json
+        if-no-files-found: error
+        retention-days: 14
+
+    - name: Check the exit code
+      shell: bash
+      run: |
+        code="${{ steps.kuyfi.outputs.exit_code }}"
+        echo "kuyfi exit code: $code (expected ${{ inputs.expected-exit }})"
+        test "$code" = "${{ inputs.expected-exit }}"

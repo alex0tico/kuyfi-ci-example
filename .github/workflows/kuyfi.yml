@@ -1,0 +1,43 @@
+name: Kuyfi
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # A clean build of the contract: every gate in kuyfi.config.json passes.
+  clean-contract-passes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/kuyfi-audit
+        with:
+          name: clean-contract
+          expected-exit: "0"
+
+  # The same source built with `--features vulnerable` (a divisor that is never
+  # validated). `--fail-on` finds supported findings and Kuyfi exits 2.
+  #
+  # In a real pipeline you would NOT assert the exit code: the red X from exit
+  # 2 *is* the gate blocking the merge. Here the job checks for exactly 2, so
+  # this example stays green while proving that the gate blocks.
+  vulnerable-contract-is-blocked:
+    # Runs after the first job: both use the config's fixed seed, so they share
+    # one deterministic Testnet account that Friendbot funds on first use.
+    needs: clean-contract-passes
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/kuyfi-audit
+        with:
+          name: vulnerable-contract
+          features: vulnerable
+          kuyfi-args: --fail-on medium
+          expected-exit: "2"

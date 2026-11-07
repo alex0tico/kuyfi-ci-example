@@ -1,0 +1,7 @@
+target/
+node_modules/
+# Reports are CI artifacts, not source.
+kuyfi-report-*.json
+.env
+.DS_Store
+test_snapshots/

@@ -1,0 +1,11 @@
+{
+	"version": 1,
+	"seed": 2026,
+	"limits": {
+		"mode": "simulate-only",
+		"maxVectors": 400
+	},
+	"failOn": "medium",
+	"failOnIncomplete": true,
+	"timeout": 600
+}
