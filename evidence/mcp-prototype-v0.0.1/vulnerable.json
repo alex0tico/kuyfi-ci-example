@@ -1,0 +1,91 @@
+{
+  "report_id": "kyf-20261109T211207Z-21f0ebe8fa11",
+  "expires_in": "24h",
+  "fuzz_calls_this_hour": "2/20",
+  "schemaVersion": "1.0.0",
+  "reportId": "kyf-20261109T211207Z-21f0ebe8fa11",
+  "kind": "fuzz",
+  "generatedAt": "2026-11-09T21:12:07.543Z",
+  "tool": {
+    "name": "kuyfi-mcp",
+    "version": "0.0.1"
+  },
+  "target": {
+    "contractId": "CD2663QJVBJBRVYLU5ZOD6MNX53KJZTP5EZ645Y4FMIELI533PNVQ56U",
+    "network": "testnet",
+    "rpcUrl": "https://soroban-testnet.stellar.org"
+  },
+  "mode": "simulate",
+  "execution": {
+    "vectorsRequested": 50,
+    "vectorsExecuted": 6,
+    "vectorsGenerated": 6,
+    "vectorsNotRun": 0,
+    "vectorsNotGenerated": 41,
+    "simulationLimit": 47,
+    "hardLimit": 50,
+    "subrequestBudget": 50,
+    "note": "This contract only has 6 possible vectors, 41 fewer than the 47 allowed for this run. All of them were executed.",
+    "cappedBySubrequestBudget": true,
+    "broadcastTransactions": 0,
+    "networkPassphrase": "Test SDF Network ; September 2015"
+  },
+  "verdict": "4 finding(s): 4 supported, 0 hypothesis (needs confirmation against the intended policy), 0 inconclusive",
+  "summary": {
+    "totalFindings": 4,
+    "byStatus": {
+      "supported": 4,
+      "hypothesis": 0,
+      "inconclusive": 0
+    },
+    "noFinding": 2,
+    "notEvaluated": 0,
+    "operationalErrors": 0
+  },
+  "findings": [
+    {
+      "id": "KYF-001",
+      "severity": "MEDIUM",
+      "status": "supported",
+      "signal": "UNCONTROLLED_PANIC",
+      "functionName": "share",
+      "vectorName": "total::ZERO",
+      "details": "Structured trace shows a root-level runtime-safety fault (scecArithDomain) with no nested-call activity — a real robustness signal (arithmetic/bounds fault), not yet confirmed exploitable. nestedCallCount=0, failureLocation=ROOT."
+    },
+    {
+      "id": "KYF-002",
+      "severity": "MEDIUM",
+      "status": "supported",
+      "signal": "UNCONTROLLED_PANIC",
+      "functionName": "share",
+      "vectorName": "total::ONE",
+      "details": "Structured trace shows a root-level runtime-safety fault (scecArithDomain) with no nested-call activity — a real robustness signal (arithmetic/bounds fault), not yet confirmed exploitable. nestedCallCount=0, failureLocation=ROOT."
+    },
+    {
+      "id": "KYF-003",
+      "severity": "MEDIUM",
+      "status": "supported",
+      "signal": "UNCONTROLLED_PANIC",
+      "functionName": "share",
+      "vectorName": "total::MAX_U32",
+      "details": "Structured trace shows a root-level runtime-safety fault (scecArithDomain) with no nested-call activity — a real robustness signal (arithmetic/bounds fault), not yet confirmed exploitable. nestedCallCount=0, failureLocation=ROOT."
+    },
+    {
+      "id": "KYF-004",
+      "severity": "MEDIUM",
+      "status": "supported",
+      "signal": "UNCONTROLLED_PANIC",
+      "functionName": "share",
+      "vectorName": "parts::ZERO",
+      "details": "Structured trace shows a root-level runtime-safety fault (scecArithDomain) with no nested-call activity — a real robustness signal (arithmetic/bounds fault), not yet confirmed exploitable. nestedCallCount=0, failureLocation=ROOT."
+    }
+  ],
+  "coverage": {
+    "notEvaluated": [],
+    "operationalErrors": [],
+    "notRun": [
+      "call-order sequences (they need state carried between calls, which a simulation does not keep)"
+    ]
+  },
+  "disclaimer": "Bounded black-box simulation on Testnet. It sends no transactions and does not enforce authorization, so it cannot show that a contract is correct or protected. Not a security guarantee."
+}
