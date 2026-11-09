@@ -1,7 +1,7 @@
 name: Kuyfi audit
 description: >-
   Builds the example contract, deploys it fresh on Stellar Testnet (Friendbot),
-  audits it with Kuyfi installed from the instawards-2-public branch, uploads
+  audits it with Kuyfi installed from the v0.2.0 tag, uploads
   the JSON report as an artifact and checks Kuyfi's exit code.
 
 inputs:
@@ -24,7 +24,7 @@ inputs:
     default: https://github.com/alex0tico/kuyfi.git
   kuyfi-ref:
     required: false
-    default: instawards-2-public
+    default: v0.2.0
 
 runs:
   using: composite
