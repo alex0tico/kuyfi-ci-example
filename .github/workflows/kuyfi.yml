@@ -11,7 +11,7 @@ permissions:
 jobs:
   # A clean build of the contract: every gate in kuyfi.config.json passes.
   clean-contract-passes:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
@@ -31,7 +31,7 @@ jobs:
     # one deterministic Testnet account that Friendbot funds on first use.
     needs: clean-contract-passes
     if: ${{ !cancelled() }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4

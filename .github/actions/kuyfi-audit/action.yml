@@ -74,7 +74,7 @@ runs:
         name: kuyfi-report-${{ inputs.name }}
         path: kuyfi-report-*.json
         if-no-files-found: error
-        retention-days: 14
+        retention-days: 90
 
     - name: Check the exit code
       shell: bash
